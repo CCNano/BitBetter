@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
 
 namespace licenseGen;
@@ -35,7 +35,7 @@ internal class Program
 
         app.Command("interactive", config =>
         {
-            String buff, licensetype="", name="", email="", businessname="";
+            String buff, licenseType = "", name = "", email = "", businessName="";
             Int16 storage = 0;
 
             Boolean validGuid = false, validInstallid = false;
@@ -45,8 +45,8 @@ internal class Program
             {
                 if (!VerifyTopOptions())
                 {
-                    if (!CoreExists()) config.Error.WriteLine($"Cant find core dll at: {coreDll.Value()}");
-                    if (!CertExists()) config.Error.WriteLine($"Cant find certificate at: {cert.Value()}");
+                    if (!CoreExists()) config.Error.WriteLine($"Can't find core dll at: {coreDll.Value()}");
+                    if (!CertExists()) config.Error.WriteLine($"Can't find certificate at: {cert.Value()}");
 
                     config.ShowHelp();
                     return 1;
@@ -54,14 +54,14 @@ internal class Program
 
                 Console.WriteLine("Interactive license mode...");
                 
-                while (licensetype == "")
+                while (licenseType == "")
                 {
                     Console.WriteLine("What would you like to generate, a [u]ser license or an [o]rg license: ");
                     buff = Console.ReadLine();
 
                     if(buff == "u")
                     {
-                        licensetype = "user";
+                        licenseType = "user";
                         Console.WriteLine("Okay, we will generate a user license.");
 
                         while (validGuid == false)
@@ -75,7 +75,7 @@ internal class Program
                     }
                     else if (buff == "o")
                     {
-                        licensetype = "org";
+                        licenseType = "org";
                         Console.WriteLine("Okay, we will generate an organization license.");
 
                         while (validInstallid == false)
@@ -87,17 +87,17 @@ internal class Program
                             else Console.WriteLine("The install-id provided does not appear to be valid.");
                         }
 
-                        while (businessname == "")
+                        while (businessName == "")
                         {
                             Console.WriteLine("Please enter a business name, default is BitBetter. [Business Name]: ");
                             buff = Console.ReadLine();
                             if (buff == "")
                             {
-                                businessname = "BitBetter";
+                                businessName = "BitBetter";
                             }
                             else if (CheckBusinessName(buff))
                             {
-                                businessname = buff;
+                                businessName = buff;
                             }
                         }
                     }
@@ -141,7 +141,7 @@ internal class Program
                     }
                 }
 
-                if (licensetype == "user")
+                if (licenseType == "user")
                 {
                     Console.WriteLine("Confirm creation of \"user\" license for username: \"" + name + "\", email: \"" + email + "\", Storage: \"" + storage + " GB\", User-GUID: \"" + guid + "\"? Y/n");
                     buff = Console.ReadLine();
@@ -155,13 +155,13 @@ internal class Program
                         return 0;
                     }
                 }
-                else if (licensetype == "org")
+                else if (licenseType == "org")
                 {
-                    Console.WriteLine("Confirm creation of \"organization\" license for business name: \"" + businessname + "\", username: \"" + name + "\", email: \"" + email + "\", Storage: \"" + storage + " GB\", Install-ID: \"" + installid + "\"? Y/n");
+                    Console.WriteLine("Confirm creation of \"organization\" license for business name: \"" + businessName + "\", username: \"" + name + "\", email: \"" + email + "\", Storage: \"" + storage + " GB\", Install-ID: \"" + installid + "\"? Y/n");
                     buff = Console.ReadLine();
                     if ( buff is "" or "y" or "Y" )
                     {
-                        GenerateOrgLicense(new X509Certificate2(cert.Value(), "test"), coreDll.Value(), name, email, storage, installid, businessname, null);
+                        GenerateOrgLicense(new X509Certificate2(cert.Value(), "test"), coreDll.Value(), name, email, storage, installid, businessName, null);
                     }
                     else
                     {
@@ -173,7 +173,6 @@ internal class Program
                 return 0;
             });
         });
-
         app.Command("user", config =>
         {
             CommandArgument name = config.Argument("Name", "your name");
@@ -188,11 +187,11 @@ internal class Program
                 {
                     if (!CoreExists())
                     {
-                        config.Error.WriteLine($"Cant find core dll at: {coreDll.Value()}");
+                        config.Error.WriteLine($"Can't find core dll at: {coreDll.Value()}");
                     }
                     if (!CertExists())
                     {
-                        config.Error.WriteLine($"Cant find certificate at: {cert.Value()}");
+                        config.Error.WriteLine($"Can't find certificate at: {cert.Value()}");
                     }
 
                     config.ShowHelp();
@@ -202,14 +201,14 @@ internal class Program
                 if (String.IsNullOrWhiteSpace(name.Value) || String.IsNullOrWhiteSpace(email.Value))
                 {
                     config.Error.WriteLine($"Some arguments are missing: Name='{name.Value}' Email='{email.Value}'");
-                    config.ShowHelp("user");
+                    config.ShowHelp(true);
                     return 1;
                 }
 
                 if (String.IsNullOrWhiteSpace(userIdArg.Value) || !Guid.TryParse(userIdArg.Value, out Guid userId))
                 {
                     config.Error.WriteLine("User ID not provided");
-                    config.ShowHelp("user");
+                    config.ShowHelp(true);
                     return 1;
                 }
 
@@ -220,7 +219,7 @@ internal class Program
                     if (parsedStorage is > Int16.MaxValue or < 0)
                     {
                         config.Error.WriteLine("The storage value provided is outside the accepted range of [0-" + Int16.MaxValue + "]");
-                        config.ShowHelp("org");
+                        config.ShowHelp(true);
                         return 1;
                     }
                     storageShort = (Int16) parsedStorage;
@@ -246,11 +245,11 @@ internal class Program
                 {
                     if (!CoreExists())
                     {
-                        config.Error.WriteLine($"Cant find core dll at: {coreDll.Value()}");
+                        config.Error.WriteLine($"Can't find core dll at: {coreDll.Value()}");
                     }
                     if (!CertExists())
                     {
-                        config.Error.WriteLine($"Cant find certificate at: {cert.Value()}");
+                        config.Error.WriteLine($"Can't find certificate at: {cert.Value()}");
                     }
 
                     config.ShowHelp();
@@ -262,7 +261,7 @@ internal class Program
                     String.IsNullOrWhiteSpace(installId.Value))
                 {
                     config.Error.WriteLine($"Some arguments are missing: Name='{name.Value}' Email='{email.Value}' InstallId='{installId.Value}'");
-                    config.ShowHelp("org");
+                    config.ShowHelp(true);
                     return 1;
                 }
 
@@ -270,7 +269,7 @@ internal class Program
                 {
                     config.Error.WriteLine("Unable to parse your installation id as a GUID");
                     config.Error.WriteLine($"Here's a new guid: {Guid.NewGuid()}");
-                    config.ShowHelp("org");
+                    config.ShowHelp(true);
                     return 1;
                 }
 
@@ -281,7 +280,7 @@ internal class Program
                     if (parsedStorage is > Int16.MaxValue or < 0)
                     {
                         config.Error.WriteLine("The storage value provided is outside the accepted range of [0-" + Int16.MaxValue + "]");
-                        config.ShowHelp("org");
+                        config.ShowHelp(true);
                         return 1;
                     }
                     storageShort = (Int16) parsedStorage;
@@ -366,11 +365,6 @@ internal class Program
 
         Object license = Activator.CreateInstance(type);
 
-        void Set(String name, Object value)
-        {
-            type.GetProperty(name).SetValue(license, value);
-        }
-
         Set("LicenseKey", String.IsNullOrWhiteSpace(key) ? Guid.NewGuid().ToString("n") : key);
         Set("Id", userId);
         Set("Name", userName);
@@ -384,10 +378,16 @@ internal class Program
         Set("Trial", false);
         Set("LicenseType", Enum.Parse(licenseTypeEnum, "User"));
 
-        Set("Hash", Convert.ToBase64String((Byte[])type.GetMethod("ComputeHash").Invoke(license, new Object[0])));
-        Set("Signature", Convert.ToBase64String((Byte[])type.GetMethod("Sign").Invoke(license, new Object[] { cert })));
+        Set("Hash", Convert.ToBase64String((Byte[])type.GetMethod("ComputeHash").Invoke(license, [])));
+        Set("Signature", Convert.ToBase64String((Byte[])type.GetMethod("Sign").Invoke(license, [cert])));
 
         Console.WriteLine(JsonConvert.SerializeObject(license, Formatting.Indented));
+        return;
+
+        void Set(String name, Object value)
+        {
+            type.GetProperty(name)?.SetValue(license, value);
+        }
     }
 
     private static void GenerateOrgLicense(X509Certificate2 cert, String corePath, String userName, String email, Int16 storage, Guid instalId, String businessName, String key)
@@ -400,47 +400,53 @@ internal class Program
 
         Object license = Activator.CreateInstance(type);
 
-        void set(String name, Object value)
-        {
-            type.GetProperty(name).SetValue(license, value);
-        }
+        Set("LicenseKey", String.IsNullOrWhiteSpace(key) ? Guid.NewGuid().ToString("n") : key);
+        Set("InstallationId", instalId);
+        Set("Id", Guid.NewGuid());
+        Set("Name", userName);
+        Set("BillingEmail", email);
+        Set("BusinessName", String.IsNullOrWhiteSpace(businessName) ? "BitBetter" : businessName);
+        Set("Enabled", true);
+		Set("Plan", "Enterprise (Annually)");
+		Set("PlanType", Enum.Parse(planTypeEnum, "EnterpriseAnnually"));
+        Set("Seats", Int32.MaxValue);
+        Set("MaxCollections", Int16.MaxValue);
+        Set("UsePolicies", true);
+        Set("UseSso", true);
+        Set("UseKeyConnector", true);
+        Set("UseScim", true);
+        Set("UseGroups", true);
+        Set("UseEvents", true);
+        Set("UseDirectory", true);
+        Set("UseTotp", true);
+        Set("Use2fa", true);
+        Set("UseApi", true);
+        Set("UseResetPassword", true);
+		Set("UseCustomPermissions", true);
+        Set("MaxStorageGb", storage == 0 ? Int16.MaxValue : storage);
+        Set("SelfHost", true);
+        Set("UsersGetPremium", true);
+        Set("UsePasswordManager", true);
+        Set("UseSecretsManager", true);
+        Set("SmSeats", Int32.MaxValue);
+        Set("SmServiceAccounts", Int32.MaxValue);
+        Set("Version", 14); //This is set to 14 to use LimitCollectionCreationDeletion can be changed to 13 to just use Secrets Manager
+        Set("Issued", DateTime.UtcNow);
+        Set("Refresh", DateTime.UtcNow.AddYears(100).AddMonths(-1));
+        Set("Expires", DateTime.UtcNow.AddYears(100));
+        Set("Trial", false);
+        Set("LicenseType", Enum.Parse(licenseTypeEnum, "Organization"));
+		Set("LimitCollectionCreationDeletion", true); //This will be used in the new version of BitWarden but can be applied now
 
-        set("LicenseKey", String.IsNullOrWhiteSpace(key) ? Guid.NewGuid().ToString("n") : key);
-        set("InstallationId", instalId);
-        set("Id", Guid.NewGuid());
-        set("Name", userName);
-        set("BillingEmail", email);
-        set("BusinessName", String.IsNullOrWhiteSpace(businessName) ? "BitBetter" : businessName);
-        set("Enabled", true);
-        set("Plan", "Custom");
-        set("PlanType", Enum.Parse(planTypeEnum, "Custom"));
-        set("Seats", (Int32)Int16.MaxValue);
-        set("MaxCollections", Int16.MaxValue);
-        set("UsePolicies", true);
-        set("UseSso", true);
-        set("UseKeyConnector", true);
-        set("UseScim", true);
-        set("UseGroups", true);
-        set("UseEvents", true);
-        set("UseDirectory", true);
-        set("UseTotp", true);
-        set("Use2fa", true);
-        set("UseApi", true);
-        set("UseResetPassword", true);
-		set("UseCustomPermissions", true);
-        set("MaxStorageGb", storage == 0 ? Int16.MaxValue : storage);
-        set("SelfHost", true);
-        set("UsersGetPremium", true);
-        set("Version", 10);
-        set("Issued", DateTime.UtcNow);
-        set("Refresh", DateTime.UtcNow.AddYears(100).AddMonths(-1));
-        set("Expires", DateTime.UtcNow.AddYears(100));
-        set("Trial", false);
-        set("LicenseType", Enum.Parse(licenseTypeEnum, "Organization"));
-
-        set("Hash", Convert.ToBase64String((Byte[])type.GetMethod("ComputeHash").Invoke(license, new Object[0])));
-        set("Signature", Convert.ToBase64String((Byte[])type.GetMethod("Sign").Invoke(license, new Object[] { cert })));
+        Set("Hash", Convert.ToBase64String((Byte[])type.GetMethod("ComputeHash").Invoke(license, [])));
+        Set("Signature", Convert.ToBase64String((Byte[])type.GetMethod("Sign").Invoke(license, [cert])));
 
         Console.WriteLine(JsonConvert.SerializeObject(license, Formatting.Indented));
+        return;
+
+        void Set(String name, Object value)
+        {
+            type.GetProperty(name)?.SetValue(license, value);
+        }
     }
 }
