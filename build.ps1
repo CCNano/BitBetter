@@ -1,3 +1,6 @@
+$ErrorActionPreference = 'Stop'
+$PSNativeCommandUseErrorActionPreference = $true
+
 # define temporary directory
 $tempdirectory = "$pwd\temp"
 # define services to patch
@@ -30,13 +33,13 @@ Copy-Item "$pwd\.keys\cert.cert" -Destination "$pwd\src\bitBetter"
 Copy-Item "$pwd\.keys\cert.pfx" -Destination "$pwd\src\licenseGen"
 
 # build bitBetter and clean the source directory after
-docker build -t bitbetter/bitbetter "$pwd\src\bitBetter"
+docker build --no-cache -t bitbetter/bitbetter "$pwd\src\bitBetter"
 Remove-Item "$pwd\src\bitBetter\cert.cert" -Force
 
 # gather all running instances
 $oldinstances = docker container ps --all -f Name=bitwarden --format '{{.ID}}'
 
-# stop all running instances
+# stop and remove all running instances
 foreach ($instance in $oldinstances) {
 	docker stop $instance
 	docker rm $instance
@@ -55,10 +58,10 @@ else
 	}
 }
 
-# stop and remove previous existing patch(ed) container
-docker stop bitwarden-patch
-docker rm bitwarden-patch
-docker image rm bitwarden-patch
+# remove previous existing patch(ed) image
+if (docker image ls -q bitwarden-patch) {
+    docker image rm bitwarden-patch
+}
 
 # start a new bitwarden instance so we can patch it
 $patchinstance = docker run -d --name bitwarden-patch ghcr.io/bitwarden/self-host:beta

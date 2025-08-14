@@ -53,7 +53,7 @@ internal class Program
                 }
 
                 Console.WriteLine("Interactive license mode...");
-                
+
                 while (licenseType == "")
                 {
                     Console.WriteLine("What would you like to generate, a [u]ser license or an [o]rg license: ");
@@ -238,7 +238,7 @@ internal class Program
             CommandArgument storage = config.Argument("Storage", "extra storage space in GB. Maximum is " + Int16.MaxValue + " (optional, default = max)");
             CommandArgument businessName = config.Argument("BusinessName", "name for the organization (optional)");
             CommandArgument key = config.Argument("Key", "your key id (optional)");
-            
+
             config.OnExecute(() =>
             {
                 if (!VerifyTopOptions())
@@ -360,7 +360,7 @@ internal class Program
     {
         Assembly core = AssemblyLoadContext.Default.LoadFromAssemblyPath(corePath);
 
-        Type type = core.GetType("Bit.Core.Models.Business.UserLicense");
+        Type type = core.GetType("Bit.Core.Billing.Models.Business.UserLicense");
         Type licenseTypeEnum = core.GetType("Bit.Core.Enums.LicenseType");
 
         Object license = Activator.CreateInstance(type);
@@ -377,7 +377,6 @@ internal class Program
         Set("Expires", DateTime.UtcNow.AddYears(100));
         Set("Trial", false);
         Set("LicenseType", Enum.Parse(licenseTypeEnum, "User"));
-
         Set("Hash", Convert.ToBase64String((Byte[])type.GetMethod("ComputeHash").Invoke(license, [])));
         Set("Signature", Convert.ToBase64String((Byte[])type.GetMethod("Sign").Invoke(license, [cert])));
 
@@ -394,7 +393,7 @@ internal class Program
     {
         Assembly core = AssemblyLoadContext.Default.LoadFromAssemblyPath(corePath);
 
-        Type type = core.GetType("Bit.Core.Models.Business.OrganizationLicense");
+        Type type = core.GetType("Bit.Core.Billing.Organizations.Models.OrganizationLicense");
         Type licenseTypeEnum = core.GetType("Bit.Core.Enums.LicenseType");
         Type planTypeEnum = core.GetType("Bit.Core.Billing.Enums.PlanType");
 
@@ -437,10 +436,10 @@ internal class Program
         Set("Trial", false);
         Set("LicenseType", Enum.Parse(licenseTypeEnum, "Organization"));
 		Set("LimitCollectionCreationDeletion", true); //This will be used in the new version of BitWarden but can be applied now
-		Set("AllowAdminAccessToAllCollectionItems", true); 
-	Set("UseRiskInsights", true);
-        Set("UseOrganizationDomains", true);
-        Set("UseAdminSponsoredFamilies", true);
+		Set("AllowAdminAccessToAllCollectionItems", true);
+		Set("UseRiskInsights", true);
+		Set("UseOrganizationDomains", true);
+		Set("UseAdminSponsoredFamilies", true);
         Set("Hash", Convert.ToBase64String((Byte[])type.GetMethod("ComputeHash").Invoke(license, [])));
         Set("Signature", Convert.ToBase64String((Byte[])type.GetMethod("Sign").Invoke(license, [cert])));
 
