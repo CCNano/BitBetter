@@ -4,6 +4,10 @@ set -e
 # detect buildx, set -e will ensure the script stops execution if not found
 docker buildx version
 
+# Enable BuildKit for better build experience and to ensure platform args are populated
+export DOCKER_BUILDKIT=1
+export COMPOSE_DOCKER_CLI_BUILD=1
+
 # define temporary directory
 TEMPDIRECTORY="$PWD/temp"
 
@@ -16,19 +20,19 @@ if [ -d "$TEMPDIRECTORY" ]; then
 fi
 
 if [ -f "$PWD/src/licenseGen/Core.dll" ]; then
-    rm -f "$PWD/src/licenseGen/Core.dll"
+	rm -f "$PWD/src/licenseGen/Core.dll"
 fi
 
 if [ -f "$PWD/src/licenseGen/cert.pfx" ]; then
-    rm -f "$PWD/src/licenseGen/cert.pfx"
+	rm -f "$PWD/src/licenseGen/cert.pfx"
 fi
 
 if [ -f "$PWD/src/bitBetter/cert.cer" ]; then
-    rm -f "$PWD/src/bitBetter/cert.cer"
+	rm -f "$PWD/src/bitBetter/cert.cer"
 fi
 
 if [ -f "$PWD/.keys/cert.cert" ]; then
-    mv "$PWD/.keys/cert.cert" "$PWD/.keys/cert.cer"
+	mv "$PWD/.keys/cert.cert" "$PWD/.keys/cert.cer"
 fi
 
 # generate keys if none are available

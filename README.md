@@ -1,12 +1,14 @@
-# BitBetter
+# BitBetter lite
 
 BitBetter is is a tool to modify Bitwarden's core dll to allow you to generate your own individual and organisation licenses.
 
 Please see the FAQ below for details on why this software was created.
 
-_Beware! BitBetter does some semi janky stuff to rewrite the bitwarden core dll and allow the installation of a self signed certificate. Use at your own risk!_
+Be aware that this branch is **only** for the lite (formerly unified) version of bitwarden. It has been rewritten and works in different ways than the master branch.
 
-Credit to https://github.com/h44z/BitBetter and https://github.com/jakeswenson/BitBetter
+_Beware! BitBetter is a solution that generates a personal certificate and uses that to generate custom licences. This requires (automated) modifying of libraries. Use at your own risk!_
+
+Credit to https://github.com/h44z/BitBetter and https://github.com/jakeswenson/BitBetter and https://github.com/GieltjE/BitBetter
 
 # Table of Contents
 - [BitBetter](#bitbetter)
@@ -30,7 +32,7 @@ The following instructions are for unix-based systems (Linux, BSD, macOS) and Wi
 ## Dependencies
 Aside from docker, which you also need for Bitwarden, BitBetter requires the following:
 
-* Bitwarden (tested with 1.47.1, might work on lower versions)
+* Bitwarden (tested with 2025.11.1 might work on lower versions), for safety always stay up to date
 * openssl (probably already installed on most Linux or WSL systems, any version should work, on Windows it will be auto installed using winget)
 
 ## Setting up BitBetter
@@ -155,6 +157,15 @@ docker exec bitwarden ln -s /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime
 ## Changes in settings.env
 
 Require a recreation of the docker container, build.sh will suffice too.
+
+## Migrating from the old unified branch
+
+```
+git branch -m unified lite
+git fetch origin
+git branch -u origin/lite lite
+git remote set-head origin -a
+```
 
 # Footnotes
 
