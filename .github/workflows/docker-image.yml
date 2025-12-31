@@ -30,7 +30,6 @@ jobs:
         run: |
           git clone --single-branch --branch lite https://github.com/jakeswenson/BitBetter.git
           cd BitBetter
-          ./.keys/generate-keys.sh y
           ./build.sh y
            docker tag bitwarden-patch:latest ghcr.io/ccnano/bitwarden-patch:latest
            docker push ghcr.io/ccnano/bitwarden-patch:latest
